@@ -1,105 +1,93 @@
 import React, { useState, useEffect } from "react";
-import Confetti from "react-confetti";
+// import Confetti from "react-confetti";
 
-const Stopwatch = () => {
-  const [time, setTime] = useState({
-    ms: 0,
-    s: 0,
-    m: 0,
-    h: 0,
-  });
-  const [running, setRunning] = useState(false);
-  const [intervalId, setIntervalId] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
+function Stopwatch() {
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [timerInterval, setTimerInterval] = useState(null);
+  // const [showConfetti, setShowConfetti] = useState(false);
 
-  useEffect(() => {
-    let timeoutId;
-    if (showConfetti) {
-      timeoutId = setTimeout(() => {
-        setShowConfetti(false);
-      }, 5000);
-    }
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [showConfetti]);
-
-  useEffect(() => {
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [intervalId]);
-
-  const start = () => {
-    if (running) return;
-
-    setRunning(true);
-    setIntervalId(
+  function startTimer() {
+    const startTime = Date.now() - elapsedTime;
+    setTimerInterval(
       setInterval(() => {
-        setTime((time) => {
-          let ms = time.ms;
-          let s = time.s;
-          let m = time.m;
-          let h = time.h;
-
-          ms += 1;
-          if (ms === 100) {
-            s += 1;
-            ms = 0;
-          }
-          if (s === 60) {
-            m += 1;
-            s = 0;
-          }
-          // Show confetti every 25 minutes
-          if (m % 25 === 0 && m !== 0) {
-            setShowConfetti(true);
-          }
-          if (m === 60) {
-            h += 1;
-            m = 0;
-          }
-
-          return { ms, s, m, h };
-        });
+        setElapsedTime(Date.now() - startTime);
       }, 10)
     );
-  };
+  }
 
-  const stop = () => {
-    if (!running) return;
+  function stopTimer() {
+    clearInterval(timerInterval);
+  }
 
-    clearInterval(intervalId);
-    setRunning(false);
-  };
+  function resetTimer() {
+    clearInterval(timerInterval);
+    setElapsedTime(0);
+  }
 
-  const reset = () => {
-    clearInterval(intervalId);
-    setRunning(false);
-    setTime({ ms: 0, s: 0, m: 0, h: 0 });
-    setShowConfetti(false);
-  };
+  function displayTime() {
+    const milliseconds = Math.floor((elapsedTime % 1000) / 10);
+    const seconds = Math.floor((elapsedTime / 1000) % 60);
+    const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+    const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
 
-  const formatTime = (time) => {
-    const pad = (value) => {
-      return value < 10 ? "0" + value : value;
-    };
+    return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}:${padTime(milliseconds)}`;
+  }
 
-    return `${time.h}:${pad(time.m)}:${pad(time.s)}:${pad(time.ms)}`;
-  };
+  function padTime(number) {
+    return number.toString().padStart(2, "0");
+  }
+
+  // if timer starts and tab is inactive, timer will run in background and when tab is active again
+  // this is to prevent timer from running in background when tab is inactive and user is not on the page (tab)
+  useEffect(() => {
+    // Run timer even if tab is inactive
+    let hidden, visibilityChange;
+    if (typeof document.hidden !== "undefined") {
+      hidden = "hidden";
+      visibilityChange = "visibilitychange";
+    } else if (typeof document.msHidden !== "undefined") {
+      hidden = "msHidden";
+      visibilityChange = "msvisibilitychange";
+    } else if (typeof document.webkitHidden !== "undefined") {
+      hidden = "webkitHidden";
+      visibilityChange = "webkitvisibilitychange";
+    }
+
+    // If the page is hidden, timer runs in background and when tab is active again
+    function handleVisibilityChange() {
+      if (document[hidden]) {
+        clearInterval(timerInterval);
+      } else {
+        // startTimer();
+        if (elapsedTime > 0) {
+          startTimer();
+        }
+      }
+    }
+
+    // Warn if the browser doesn't support addEventListener or the Page Visibility API
+    if (
+      typeof document.addEventListener === "undefined" ||
+      typeof document[hidden] === "undefined"
+    ) {
+      console.log("This browser doesn't support Page Visibility API.");
+    } else {
+      document.addEventListener(visibilityChange, handleVisibilityChange, false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
+
     <div className="stopwatch">
-      {showConfetti && <Confetti />}{" "}
-      {/* show confetti when showConfetti is true */}
-      <div className="time">{formatTime(time)}</div>
+      <div className="time">{displayTime()}</div>
       <div className="controls">
-        <button onClick={start}>Start</button>
-        <button onClick={stop}>Stop</button>
-        <button onClick={reset}>Reset</button>
+        <button onClick={startTimer}>Start</button>
+        <button onClick={stopTimer}>Stop</button>
+        <button onClick={resetTimer}>Reset</button>
       </div>
     </div>
   );
-};
+}
 
 export default Stopwatch;

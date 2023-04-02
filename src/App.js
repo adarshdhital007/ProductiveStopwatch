@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Stopwatch from "./components/Stopwatch";
 import Counter from "./components/Counter";
 

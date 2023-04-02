@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ProductiveStopwatch/static/css/main.f3c8d9c5.css",
-    "main.js": "/ProductiveStopwatch/static/js/main.ef26e4cb.js",
+    "main.js": "/ProductiveStopwatch/static/js/main.94aa0cfc.js",
     "index.html": "/ProductiveStopwatch/index.html",
     "main.f3c8d9c5.css.map": "/ProductiveStopwatch/static/css/main.f3c8d9c5.css.map",
-    "main.ef26e4cb.js.map": "/ProductiveStopwatch/static/js/main.ef26e4cb.js.map"
+    "main.94aa0cfc.js.map": "/ProductiveStopwatch/static/js/main.94aa0cfc.js.map"
   },
   "entrypoints": [
     "static/css/main.f3c8d9c5.css",
-    "static/js/main.ef26e4cb.js"
+    "static/js/main.94aa0cfc.js"
   ]
 }

@@ -37,8 +37,8 @@ function Stopwatch() {
     return number.toString().padStart(2, "0");
   }
 
-  // when tab is inactive, stop timer and start timer again when tab is active again (visibilitychange event) and elapsedTime is greater than 0 (timer is running)
-  // this is to prevent timer from starting again when tab is active again and elapsedTime is 0 (timer is not running)
+  // if timer starts and tab is inactive, timer will run in background and when tab is active again
+  // this is to prevent timer from running in background when tab is inactive and user is not on the page (tab)
   useEffect(() => {
     // Run timer even if tab is inactive
     let hidden, visibilityChange;
@@ -53,7 +53,7 @@ function Stopwatch() {
       visibilityChange = "webkitvisibilitychange";
     }
 
-    // If the page is hidden, stop the timer when the user returns to the page (tab) again (visibilitychange event) and start the timer again
+    // If the page is hidden, timer runs in background and when tab is active again
     function handleVisibilityChange() {
       if (document[hidden]) {
         clearInterval(timerInterval);
